@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 const productHighlightData = {
   product: {
     name: 'RoboArm Pro X1',
-    image: 'https://via.placeholder.com/600x400?text=RoboArm+Pro+X1',
+    image: 'https://imgs.search.brave.com/675Hv5HkzUwcokYiTI8RXQDUE5wDARwnLF_w2DKdU8M/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by8zZC1yZW5kZXJp/bmctd2hpdGUtcm9i/b3RpYy1hcm1fNDkz/ODA2LTEwMzIuanBn/P3NlbXQ9YWlzX2h5/YnJpZA',
     description: 'Our flagship robotic arm with 6 degrees of freedom, precision control, and programmable interface.',
     specifications: [
       '6-axis movement with 360° rotation',

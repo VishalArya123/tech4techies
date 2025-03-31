@@ -12,12 +12,12 @@ export const products = [
       inStock: true,
       rating: 4.8,
       discount: 10,
-      image: "/api/placeholder/250/200",
+      image: "https://store.arduino.cc/cdn/shop/files/A000067_00.front_1000x750.jpg?v=1727098253",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://store.arduino.cc/cdn/shop/files/A000067_01.iso_ac4058f0-048a-497d-a924-c5e64ad45dfa_1000x750.jpg?v=1727098253",
+        "https://store.arduino.cc/cdn/shop/files/A000067_02.back_cd01aa63-0083-4718-949d-b132faf560f8_1000x750.jpg?v=1727098253",
+        "https://store.arduino.cc/cdn/shop/files/A000067_03.unbox_6804911f-5b21-4753-8244-3764bc32eda1_1000x750.jpg?v=1727098253",
+        "https://store.arduino.cc/cdn/shop/files/A000067_04.box_1000x750.jpg?v=1727098253"
       ],
       keywords: ["arduino", "mega", "microcontroller", "development board", "electronics", "programming"],
       description: "The Arduino Mega 2560 is a microcontroller board based on the ATmega2560. It has 54 digital input/output pins (of which 15 can be used as PWM outputs), 16 analog inputs, 4 UARTs (hardware serial ports), a 16 MHz crystal oscillator, a USB connection, a power jack, an ICSP header, and a reset button.",
@@ -89,12 +89,12 @@ export const products = [
       inStock: true,
       rating: 4.9,
       discount: 0,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/71A14Sz2bWL._AC_SX679_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/51L5hZZGpZL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/51mgYkpcmyL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/61BXlGfh+AL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/71A14Sz2bWL._AC_SX679_.jpg"
       ],
       keywords: ["raspberry pi", "pi 4", "single board computer", "linux", "programming", "microcontroller"],
       description: "The Raspberry Pi 4 Model B is the latest product in the popular Raspberry Pi range of computers. It offers ground-breaking increases in processor speed, multimedia performance, memory, and connectivity compared to the prior-generation Raspberry Pi 3 Model B+.",
@@ -153,11 +153,11 @@ export const products = [
       inStock: true,
       rating: 4.2,
       discount: 20,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/61yp5VAEBEL._SX522_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/61SiRtdK4BL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/615hzq6MxwL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/61ErG7hwzRL._SX522_.jpg"
       ],
       keywords: ["ultrasonic", "sensor", "distance", "proximity", "HC-SR04", "robot"],
       description: "The HC-SR04 ultrasonic sensor uses sonar to determine distance to an object like bats do. It offers excellent non-contact range detection with high accuracy and stable readings in an easy-to-use package.",
@@ -215,11 +215,11 @@ export const products = [
       inStock: true,
       rating: 4.0,
       discount: 25,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/81MnGggEnLL.__AC_SX300_SY300_QL70_FMwebp_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/71tNQUKT9nL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/71TOO8NJYTL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/71diBKBk6OL._AC_SX679_.jpg"
       ],
       keywords: ["servo", "motor", "SG90", "robotic arm", "control", "movement", "actuator"],
       description: "The Tower Pro SG90 is a tiny and lightweight servo with high output power. It can rotate approximately 180 degrees (90 in each direction) and works just like standard servos but smaller. You can use any servo code, hardware, or library to control these servos.",
@@ -276,12 +276,12 @@ export const products = [
       inStock: false,
       rating: 4.7,
       discount: 15,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/612eALAbpgL._SX522_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/61r34gdhxDL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/61xa3vc2TYL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/71D4E5DS-qL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/71d6+P4PUzL._SX522_.jpg"
       ],
       keywords: ["ESP32", "WiFi", "Bluetooth", "IoT", "wireless", "microcontroller", "development board"],
       description: "The ESP32 Development Board is a powerful microcontroller that offers both WiFi and Bluetooth connectivity. It features a dual-core processor running at 240MHz, making it ideal for IoT projects that require wireless connectivity and significant processing power.",
@@ -341,11 +341,11 @@ export const products = [
       inStock: true,
       rating: 4.3,
       discount: 10,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/61VkNn0PcaL._AC_SX679_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/51HixiEBbcL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/61vk8Pq04jL._AC_SX679_.jpg",
+        "https://m.media-amazon.com/images/I/6199bxPjI1L._AC_SX679_.jpg"
       ],
       keywords: ["motor driver", "L298N", "H-bridge", "DC motor", "stepper motor", "robot movement"],
       description: "The L298N Motor Driver is a high power motor driver module for driving DC and stepper motors. This module uses the popular L298N dual H-Bridge motor driver IC, which can control the speed and direction of two DC motors, or control one stepper motor with ease.",
@@ -403,11 +403,11 @@ export const products = [
       inStock: true,
       rating: 4.5,
       discount: 20,
-      image: "/api/placeholder/250/200",
+      image: "https://m.media-amazon.com/images/I/51J9ha5fZKL._SX522_.jpg",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://m.media-amazon.com/images/I/51Wahw9U7lL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/51B2G85wYLL._SX522_.jpg",
+        "https://m.media-amazon.com/images/I/51OJAPidhEL._SX522_.jpg"
       ],
       keywords: ["temperature", "humidity", "sensor", "DHT22", "environmental", "weather", "monitoring"],
       description: "The DHT22 is a basic, low-cost digital temperature and humidity sensor. It uses a capacitive humidity sensor and a thermistor to measure the surrounding air, and outputs a digital signal on the data pin (no analog input pins needed).",
@@ -465,12 +465,12 @@ export const products = [
       inStock: true,
       rating: 4.8,
       discount: 10,
-      image: "/api/placeholder/250/200",
+      image: "https://www.makeblock.com/cdn/shop/files/mBot2_b0130252-63ea-45ff-845d-6eef94036be7_625x_progressive_webp_1000x.progressive.webp.jpg?v=1736486446",
       images: [
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400",
-        "/api/placeholder/600/400"
+        "https://www.makeblock.com/cdn/shop/files/mBot2_b0130252-63ea-45ff-845d-6eef94036be7_625x_progressive_webp_1000x.progressive.webp.jpg?v=1736486446",
+        "https://www.makeblock.com/cdn/shop/files/mBot2overview_1000x.progressive.webp.jpg?v=1736486446",
+        "https://www.makeblock.com/cdn/shop/files/Interactive_STEM_Robot_1_1000x.progressive.jpg?v=1740018930",
+        "https://www.makeblock.com/cdn/shop/files/mBot2_3_93fdffd3-8e28-4696-a87e-5b5c63c84146_1000x.progressive.jpg?v=1740020091"
       ],
       keywords: ["robot kit", "beginner", "learning", "educational", "DIY", "arduino", "starter kit"],
       description: "The Elegoo Robot Kit for Beginners is a comprehensive starter kit designed to introduce beginners to robotics and programming. This all-in-one package includes everything you need to build a fully functional robot car with obstacle avoidance, line following, and remote control capabilities.",

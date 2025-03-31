@@ -44,9 +44,9 @@ const heroData = {
 
 // Placeholder images for carousel - in real app these would be actual product images
 const placeholderImages = [
-  'https://via.placeholder.com/800x400?text=Advanced+Robotics',
-  'https://via.placeholder.com/800x400?text=Educational+Kits', 
-  'https://via.placeholder.com/800x400?text=New+Arrivals'
+  'https://social-innovation.hitachi/en-us/solutions/robotics/-/media/project/hitachi/sib/en/solutions/robotics/image/robotics-img3.jpg',
+  'https://sphero.com/cdn/shop/files/rvr-prodev_500x.jpg?v=1727202636', 
+  'https://www.makeblock.com/cdn/shop/files/mBot2_b0130252-63ea-45ff-845d-6eef94036be7_625x_progressive_webp_1000x.progressive.webp.jpg?v=1736486446'
 ];
 
 function HeroSection() {
