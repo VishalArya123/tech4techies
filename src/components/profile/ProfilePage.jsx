@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import UserDetails from './UserDetails';
 import OrderHistory from './OrderHistory';
 import OrderTracking from './OrderTracking';
@@ -8,25 +8,24 @@ import WishlistItems from './WishlistItems';
 import CartItems from './CartItems';
 
 const ProfilePage = () => {
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth0();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('user-details'); // Default to user details tab
 
   // Redirect if not logged in
   useEffect(() => {
-    if (!user) {
+    if (!isAuthenticated) {
       navigate('/'); // Redirect to home page if user is not logged in
     }
-  }, [user, navigate]);
+  }, [isAuthenticated, navigate]);
 
   // If user is not logged in, render nothing (redirection will happen via useEffect)
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return null;
   }
 
   const handleLogout = () => {
-    logout();
-    navigate('/');
+    logout({ returnTo: window.location.origin });
   };
 
   return (
@@ -40,11 +39,11 @@ const ProfilePage = () => {
             <div className="flex items-center space-x-4 mb-4">
               <div className="bg-blue-100 rounded-full p-3">
                 <span className="text-blue-600 font-bold text-xl">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div>
-                <p className="font-semibold">{user.name}</p>
+                <p className="font-semibold">{user.name || user.email}</p>
                 <p className="text-sm text-gray-600">{user.email}</p>
               </div>
             </div>

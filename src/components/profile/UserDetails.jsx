@@ -1,36 +1,109 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const UserDetails = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, getAccessTokenSilently } = useAuth0();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name || '',
-    email: user.email || '',
-    phone: user.phone || '',
-    address: user.address || '',
-    city: user.city || '',
-    state: user.state || '',
-    pincode: user.pincode || '',
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
   });
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [userMetadata, setUserMetadata] = useState({});
+
+  // Fetch user metadata from Auth0 on component mount
+  useEffect(() => {
+    const getUserMetadata = async () => {
+      try {
+        const accessToken = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
+            scope: "read:current_user update:current_user_metadata"
+          },
+        });
+
+        // Note: In a production app, you'd make a server-side call to the Auth0 Management API
+        // This is simplified for demonstration purposes
+        // In reality, you'd want to handle this through your backend for security reasons
+        
+        // Initialize with what we know from the Auth0 user object
+        const metadata = {
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          city: user.city || '',
+          state: user.state || '',
+          pincode: user.pincode || '',
+          ...user.user_metadata // Spread any existing user metadata
+        };
+        
+        setUserMetadata(metadata);
+        setFormData(metadata);
+      } catch (e) {
+        console.log(e.message);
+        // Initialize with just the basic Auth0 user info
+        const basicInfo = {
+          name: user.name || '',
+          email: user.email || '',
+          phone: '',
+          address: '',
+          city: '',
+          state: '',
+          pincode: '',
+        };
+        setUserMetadata(basicInfo);
+        setFormData(basicInfo);
+      }
+    };
+
+    getUserMetadata();
+  }, [getAccessTokenSilently, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateProfile(formData);
-    setMessage({ type: 'success', text: 'Profile updated successfully!' });
-    setIsEditing(false);
     
-    // Clear message after 3 seconds
-    setTimeout(() => {
-      setMessage({ type: '', text: '' });
-    }, 3000);
+    try {
+      // In a real application, you would:
+      // 1. Get an access token with the appropriate scopes
+      // 2. Send the updated user metadata to your backend
+      // 3. Your backend would update the user metadata using the Auth0 Management API
+      
+      // For now, we'll just simulate success
+      setUserMetadata(formData);
+      setMessage({ type: 'success', text: 'Profile updated successfully! (Note: In this demo, changes are not actually saved to Auth0)' });
+      setIsEditing(false);
+      
+      // Clear message after 5 seconds
+      setTimeout(() => {
+        setMessage({ type: '', text: '' });
+      }, 5000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setMessage({ type: '', text: '' });
+      }, 5000);
+    }
   };
+
+  // Display loading state while fetching metadata
+  if (!userMetadata) {
+    return <div className="text-center py-8">Loading user information...</div>;
+  }
+
+  const displayUser = userMetadata;
 
   return (
     <div>
@@ -81,8 +154,10 @@ const UserDetails = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled
+                className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50"
               />
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed through this form</p>
             </div>
             
             <div>
@@ -182,27 +257,33 @@ const UserDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
-              <p className="mt-1">{user.name || 'Not provided'}</p>
+              <p className="mt-1">{displayUser.name || 'Not provided'}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Email Address</h3>
-              <p className="mt-1">{user.email || 'Not provided'}</p>
+              <p className="mt-1">{displayUser.email || 'Not provided'}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Phone Number</h3>
-              <p className="mt-1">{user.phone || 'Not provided'}</p>
+              <p className="mt-1">{displayUser.phone || 'Not provided'}</p>
             </div>
           </div>
           
           <div className="border-t pt-6 mt-6">
             <h3 className="text-lg font-medium mb-4">Address Information</h3>
             
-            {user.address ? (
+            {displayUser.address ? (
               <div>
-                <p>{user.address}</p>
-                <p>{user.city}, {user.state} {user.pincode}</p>
+                <p>{displayUser.address}</p>
+                <p>
+                  {[
+                    displayUser.city,
+                    displayUser.state,
+                    displayUser.pincode
+                  ].filter(Boolean).join(', ')}
+                </p>
               </div>
             ) : (
               <p className="text-gray-500">No address information provided</p>

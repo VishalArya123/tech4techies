@@ -1,24 +1,27 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, ShoppingCart } from 'lucide-react';
-import { WishlistContext } from '../context/WishlistContext';
-import { CartContext } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 
 const WishlistItems = () => {
-  const { wishlistItems, removeFromWishlist } = useContext(WishlistContext);
-  const { addToCart } = useContext(CartContext);
+  const { wishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
 
   // Handle moving an item from wishlist to cart
   const handleMoveToCart = (product) => {
-    addToCart(product, 1);
-    removeFromWishlist(product.id);
+    const added = addToCart(product, 1);
+    if (added) {
+      removeFromWishlist(product.id);
+      // Optional: Add success notification here
+    }
   };
 
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">My Wishlist</h1>
 
-      {wishlistItems.length === 0 ? (
+      {wishlist.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <h3 className="text-xl font-semibold text-gray-700 mb-2">Your wishlist is empty</h3>
           <p className="text-gray-500 mb-4">Items you add to your wishlist will appear here.</p>
@@ -31,15 +34,15 @@ const WishlistItems = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {wishlistItems.map(product => (
+          {wishlist.map(product => (
             <div 
               key={product.id} 
               className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
             >
               <div className="relative">
-                <Link to={`/product/${product.slug}`}>
+                <Link to={`/product/${product.id}`}>
                   <img
-                    src={product.image}
+                    src={product.image || "/api/placeholder/300/200"}
                     alt={product.name}
                     className="w-full h-48 object-cover"
                   />
@@ -52,7 +55,7 @@ const WishlistItems = () => {
               </div>
               
               <div className="p-4">
-                <Link to={`/product/${product.slug}`}>
+                <Link to={`/product/${product.id}`}>
                   <h3 className="font-medium text-lg mb-2">{product.name}</h3>
                 </Link>
                 

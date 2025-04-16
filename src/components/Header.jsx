@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Search, ShoppingCart, User, Menu, X, Phone, HelpCircle, Package, MapPin } from 'lucide-react';
 import logo from '.././assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import AuthModal from './auth/AuthModal';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useCart } from './context/CartContext';
 
 const headerData = {
   topBar: {
@@ -23,33 +23,51 @@ const headerData = {
       { text: 'Contact Us', href: '#' },
       { text: 'FAQs', href: '#' },
     ],
-  },
-  cart: {
-    total: '₹ 0.00',
-    items: 0,
-  },
+  }
 };
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { currentUser, signOut } = useAuth();
+  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const navigate = useNavigate();
+  const { cart } = useCart();
+
+  const cartItemsCount = cart?.length || 0;
+  const cartTotal = cart?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
   const handleAuthClick = () => {
-    if (currentUser) {
-      // If user is logged in, navigate to profile
-      navigate('/profile');
+    if (isAuthenticated) {
+      // Toggle dropdown when already authenticated
+      toggleProfileDropdown();
     } else {
       // If user is not logged in, open the auth modal
-      setIsAuthModalOpen(true);
+      loginWithRedirect();
     }
   };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isProfileDropdownOpen && !event.target.closest('.profile-dropdown-container')) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileDropdownOpen]);
 
   return (
     <header className="border-b border-gray-700" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
@@ -71,7 +89,14 @@ function Header() {
                 key={index} 
                 href={link.href} 
                 className="hover:text-[#6FA5C8] transition-colors duration-300 hidden md:flex items-center"
-                onClick={() => alert("Yet to build")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (isAuthenticated) {
+                    navigate('/profile');
+                  } else {
+                    loginWithRedirect();
+                  }
+                }}
               >
                 {link.icon}
                 <span className="ml-1">{link.text}</span>
@@ -109,26 +134,32 @@ function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center">
-            <button className="p-2 text-[#0B1726] hover:text-[#4A90E2] transition-colors duration-300 relative group">
+            <Link to="/profile" className="p-2 text-[#0B1726] hover:text-[#4A90E2] transition-colors duration-300 relative group">
               <ShoppingCart size={24} />
-              {headerData.cart.items > 0 && (
+              {cartItemsCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#FF8C00] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                  {headerData.cart.items}
+                  {cartItemsCount}
                 </span>
               )}
               <div className="hidden group-hover:block absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-md py-3 px-4 z-10 border border-gray-200">
-                <p className="text-sm text-[#1F1F1F]">Your cart is empty</p>
-                <div className="mt-2 pt-2 border-t border-gray-100">
-                  <span className="font-medium text-[#0B1726]">{headerData.cart.total}</span>
-                </div>
+                {cartItemsCount > 0 ? (
+                  <>
+                    <p className="text-sm text-[#1F1F1F]">{cartItemsCount} item(s) in cart</p>
+                    <div className="mt-2 pt-2 border-t border-gray-100">
+                      <span className="font-medium text-[#0B1726]">₹{cartTotal.toFixed(2)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-[#1F1F1F]">Your cart is empty</p>
+                )}
               </div>
-            </button>
+            </Link>
             <div className="hidden md:flex items-center ml-4">
-              <span className="text-sm font-medium text-[#0B1726]">{headerData.cart.total}</span>
+              <span className="text-sm font-medium text-[#0B1726]">₹{cartTotal.toFixed(2)}</span>
             </div>
             
             {/* Sign In / Profile */}
-            <div className="ml-6 relative group">
+            <div className="ml-6 relative profile-dropdown-container">
               <button 
                 onClick={handleAuthClick}
                 className="py-2 px-4 text-[#0B1726] bg-gray-100 rounded-full hover:bg-[#6FA5C8] hover:text-white transition duration-300 flex items-center"
@@ -136,19 +167,23 @@ function Header() {
               >
                 <User size={20} />
                 <span className="ml-2 hidden md:inline text-sm">
-                  {currentUser ? currentUser.name : 'Sign In'}
+                  {isAuthenticated ? (user?.name || 'My Profile') : 'Sign In'}
                 </span>
               </button>
-              {currentUser && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10 hidden group-hover:block border border-gray-200">
+              {isAuthenticated && isProfileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10 border border-gray-200">
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-sm text-[#0B1726] hover:bg-[#6FA5C8] hover:text-white transition-colors duration-300 w-full text-left"
+                    onClick={() => setIsProfileDropdownOpen(false)}
                   >
                     Profile
                   </Link>
                   <button
-                    onClick={signOut}
+                    onClick={() => {
+                      logout({ returnTo: window.location.origin });
+                      setIsProfileDropdownOpen(false);
+                    }}
                     className="block px-4 py-2 text-sm text-[#0B1726] hover:bg-[#6FA5C8] hover:text-white transition-colors duration-300 w-full text-left"
                   >
                     Sign Out
@@ -197,7 +232,10 @@ function Header() {
                   <a 
                     href={link.href} 
                     className="text-[#0B1726] hover:text-[#4A90E2] transition-colors duration-300 flex items-center font-medium"
-                    onClick={link.text !== 'Home' ? () => alert("Yet to build") : undefined}
+                    onClick={link.text !== 'Home' ? (e) => {
+                      e.preventDefault();
+                      alert("This section is under development!");
+                    } : undefined}
                     style={{ fontFamily: "'Orbitron', sans-serif" }}
                   >
                     {link.text}
@@ -208,9 +246,6 @@ function Header() {
           </ul>
         </nav>
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </header>
   );
 }

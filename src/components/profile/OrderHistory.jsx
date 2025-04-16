@@ -1,13 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { Clock, Package, Check, AlertTriangle } from 'lucide-react';
+import { useOrders } from '../context/OrdersContext';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const OrderHistory = () => {
-  const { user } = useAuth();
-  
-  // This would come from an API in a real application
-  const orders = user.orders || [];
+  const { orders } = useOrders();
+  const { isAuthenticated } = useAuth0();
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -23,6 +22,15 @@ const OrderHistory = () => {
         return <Clock size={18} className="text-gray-500" />;
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold mb-2">Please Sign In</h3>
+        <p className="text-gray-600 mb-6">You need to be signed in to view your order history.</p>
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (
@@ -66,11 +74,11 @@ const OrderHistory = () => {
             
             {/* Order Items */}
             <div className="p-4">
-              {order.items.map((item) => (
+              {order.products.map((item) => (
                 <div key={item.id} className="flex py-4 border-b last:border-b-0">
                   <div className="w-20 h-20 flex-shrink-0">
                     <img
-                      src={item.image}
+                      src={item.image || "/api/placeholder/80/80"}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -88,7 +96,7 @@ const OrderHistory = () => {
             {/* Order Footer */}
             <div className="bg-gray-50 p-4 flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
-                <p className="text-gray-600">Total: <span className="font-bold text-gray-900">${order.total.toFixed(2)}</span></p>
+                <p className="text-gray-600">Total: <span className="font-bold text-gray-900">${order.totalAmount.toFixed(2)}</span></p>
               </div>
               
               <div className="mt-3 md:mt-0 space-x-3">
@@ -96,11 +104,6 @@ const OrderHistory = () => {
                   <Link
                     to={`/profile/tracking/${order.id}`}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-block"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // Set the active tab to tracking in the parent component
-                      // This would be handled through context or props in a real app
-                    }}
                   >
                     Track Order
                   </Link>

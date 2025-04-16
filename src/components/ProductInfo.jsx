@@ -26,7 +26,10 @@ const ProductInfo = ({ data }) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(data, quantity);
+    const added = addToCart(data, quantity);
+    if (added) {
+      // Optional: Add success notification here
+    }
   };
 
   const handleWishlistClick = () => {

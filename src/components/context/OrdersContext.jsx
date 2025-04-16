@@ -1,90 +1,68 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useAuth } from './AuthContext';
-import { useCart } from './CartContext';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
-const OrdersContext = createContext(null);
+const OrdersContext = createContext();
 
-export const OrdersProvider = ({ children }) => {
+export function useOrders() {
+  return useContext(OrdersContext);
+}
+
+export function OrdersProvider({ children }) {
   const [orders, setOrders] = useState([]);
-  const { currentUser } = useAuth();
-  const { cartItems, clearCart, getCartTotal } = useCart();
+  const { isAuthenticated, user } = useAuth0();
 
-  // Load orders from localStorage on mount and when user changes
+  // Load orders from localStorage on component mount
   useEffect(() => {
-    if (currentUser) {
-      const savedOrders = localStorage.getItem(`orders_${currentUser.id}`);
+    if (isAuthenticated && user) {
+      const userId = user.sub;
+      const savedOrders = localStorage.getItem(`orders_${userId}`);
       if (savedOrders) {
         setOrders(JSON.parse(savedOrders));
-      } else {
-        setOrders([]);
       }
     } else {
       setOrders([]);
     }
-  }, [currentUser]);
+  }, [isAuthenticated, user]);
 
   // Save orders to localStorage whenever it changes
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem(`orders_${currentUser.id}`, JSON.stringify(orders));
+    if (isAuthenticated && user) {
+      const userId = user.sub;
+      localStorage.setItem(`orders_${userId}`, JSON.stringify(orders));
     }
-  }, [orders, currentUser]);
+  }, [orders, isAuthenticated, user]);
 
-  // Create a new order
-  const createOrder = () => {
-    if (!currentUser || cartItems.length === 0) {
-      return { success: false, message: "Unable to create order" };
+  const placeOrder = (products, totalAmount) => {
+    if (!isAuthenticated) {
+      alert("Please sign in to place an order");
+      return false;
     }
 
     const newOrder = {
-      id: `order-${Date.now()}`,
-      userId: currentUser.id,
-      items: [...cartItems],
-      total: getCartTotal(),
-      status: "Processing",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      id: `ORD-${Date.now()}`,
+      products: [...products],
+      totalAmount,
+      status: 'Processing',
+      date: new Date().toISOString(),
+      expectedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
     };
 
     setOrders(prevOrders => [newOrder, ...prevOrders]);
-    clearCart();
-
-    return { success: true, order: newOrder };
+    return true;
   };
 
-  // Cancel an order
   const cancelOrder = (orderId) => {
-    const orderToCancel = orders.find(order => order.id === orderId);
-    
-    if (!orderToCancel) {
-      return { success: false, message: "Order not found" };
-    }
-    
-    if (orderToCancel.status !== "Processing") {
-      return { success: false, message: "Only orders in 'Processing' status can be cancelled" };
-    }
-    
     setOrders(prevOrders => 
       prevOrders.map(order => 
-        order.id === orderId 
-          ? { ...order, status: "Cancelled", updatedAt: new Date().toISOString() } 
-          : order
+        order.id === orderId ? { ...order, status: 'Cancelled' } : order
       )
     );
-    
-    return { success: true, message: "Order cancelled successfully" };
-  };
-
-  // Get order by id
-  const getOrder = (orderId) => {
-    return orders.find(order => order.id === orderId);
   };
 
   const value = {
     orders,
-    createOrder,
-    cancelOrder,
-    getOrder
+    placeOrder,
+    cancelOrder
   };
 
   return (
@@ -92,10 +70,4 @@ export const OrdersProvider = ({ children }) => {
       {children}
     </OrdersContext.Provider>
   );
-};
-
-export const useOrders = () => {
-  return useContext(OrdersContext);
-};
-
-export default OrdersContext;
+}

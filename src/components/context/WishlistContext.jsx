@@ -1,75 +1,67 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
-const WishlistContext = createContext(null);
+const WishlistContext = createContext();
 
-export const WishlistProvider = ({ children }) => {
-  const [wishlistItems, setWishlistItems] = useState([]);
-  const { currentUser } = useAuth();
+export function useWishlist() {
+  return useContext(WishlistContext);
+}
 
-  // Load wishlist from localStorage on mount and when user changes
+export function WishlistProvider({ children }) {
+  const [wishlist, setWishlist] = useState([]);
+  const { isAuthenticated, user } = useAuth0();
+
+  // Load wishlist from localStorage on component mount
   useEffect(() => {
-    if (currentUser) {
-      const savedWishlist = localStorage.getItem(`wishlist_${currentUser.id}`);
+    if (isAuthenticated && user) {
+      const userId = user.sub;
+      const savedWishlist = localStorage.getItem(`wishlist_${userId}`);
       if (savedWishlist) {
-        setWishlistItems(JSON.parse(savedWishlist));
-      } else {
-        setWishlistItems([]);
+        setWishlist(JSON.parse(savedWishlist));
       }
     } else {
-      setWishlistItems([]);
+      setWishlist([]);
     }
-  }, [currentUser]);
+  }, [isAuthenticated, user]);
 
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem(`wishlist_${currentUser.id}`, JSON.stringify(wishlistItems));
+    if (isAuthenticated && user) {
+      const userId = user.sub;
+      localStorage.setItem(`wishlist_${userId}`, JSON.stringify(wishlist));
     }
-  }, [wishlistItems, currentUser]);
+  }, [wishlist, isAuthenticated, user]);
 
-  // Add item to wishlist
   const addToWishlist = (product) => {
-    if (!currentUser) return { success: false, message: "Please sign in to add items to wishlist" };
+    if (!isAuthenticated) {
+      alert("Please sign in to add items to your wishlist");
+      return false;
+    }
 
-    setWishlistItems(prevItems => {
-      // Check if item is already in wishlist
-      if (prevItems.some(item => item.id === product.id)) {
-        return prevItems; // Item already exists
+    setWishlist(prevWishlist => {
+      if (!prevWishlist.some(item => item.id === product.id)) {
+        return [...prevWishlist, product];
       }
-
-      // Add new item with timestamp
-      return [...prevItems, { 
-        ...product, 
-        addedAt: new Date().toISOString() 
-      }];
+      return prevWishlist;
     });
-
-    return { success: true, message: "Added to wishlist" };
+    
+    return true;
   };
 
-  // Remove item from wishlist
   const removeFromWishlist = (productId) => {
-    if (!currentUser) return;
-
-    setWishlistItems(prevItems => 
-      prevItems.filter(item => item.id !== productId)
-    );
+    setWishlist(prevWishlist => prevWishlist.filter(item => item.id !== productId));
   };
 
-  // Check if an item is in the wishlist
   const isInWishlist = (productId) => {
-    return wishlistItems.some(item => item.id === productId);
+    return wishlist.some(item => item.id === productId);
   };
 
-  // Clear wishlist
   const clearWishlist = () => {
-    if (!currentUser) return;
-    setWishlistItems([]);
+    setWishlist([]);
   };
 
   const value = {
-    wishlistItems,
+    wishlist,
     addToWishlist,
     removeFromWishlist,
     isInWishlist,
@@ -81,10 +73,4 @@ export const WishlistProvider = ({ children }) => {
       {children}
     </WishlistContext.Provider>
   );
-};
-
-export const useWishlist = () => {
-  return useContext(WishlistContext);
-};
-
-export { WishlistContext };
+}

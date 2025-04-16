@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { CheckCircle, Circle, Package, Truck, Home, AlertTriangle } from 'lucide-react';
+import { useOrders } from '../context/OrdersContext';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const OrderTracking = () => {
-  const { user } = useAuth();
+  const { orders, cancelOrder } = useOrders();
+  const { isAuthenticated } = useAuth0();
   const [trackingId, setTrackingId] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   
-  // This would be fetched from an API in a real application
-  const activeOrders = (user.orders || []).filter(
+  // Filter only active orders (not Delivered or Cancelled)
+  const activeOrders = orders.filter(
     order => order.status !== 'Delivered' && order.status !== 'Cancelled'
   );
 
   const handleTrackOrder = () => {
-    // In a real app, this would make an API call to get tracking information
-    const order = (user.orders || []).find(o => o.id === trackingId);
+    const order = orders.find(o => o.id === trackingId);
     if (order) {
       setSelectedOrder(order);
     } else {
@@ -27,13 +28,23 @@ const OrderTracking = () => {
     setTrackingId(order.id);
   };
 
+  const handleCancelOrder = (orderId) => {
+    if (window.confirm("Are you sure you want to cancel this order?")) {
+      cancelOrder(orderId);
+      // Update the selected order if it's the one being cancelled
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder({...selectedOrder, status: 'Cancelled'});
+      }
+    }
+  };
+
   const renderTrackingSteps = (order) => {
     const steps = [
       { name: 'Order Placed', icon: <CheckCircle size={24} />, date: order.date },
-      { name: 'Processing', icon: <Circle size={24} />, date: order.processingDate },
-      { name: 'Shipped', icon: <Package size={24} />, date: order.shippedDate },
-      { name: 'Out for Delivery', icon: <Truck size={24} />, date: order.outForDeliveryDate },
-      { name: 'Delivered', icon: <Home size={24} />, date: order.deliveredDate }
+      { name: 'Processing', icon: <Circle size={24} />, date: order.date }, // Using order.date as fallback
+      { name: 'Shipped', icon: <Package size={24} />, date: null },
+      { name: 'Out for Delivery', icon: <Truck size={24} />, date: null },
+      { name: 'Delivered', icon: <Home size={24} />, date: null }
     ];
 
     let currentStep = 0;
@@ -86,12 +97,7 @@ const OrderTracking = () => {
           <div className="mt-8 border-t pt-6">
             <button
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              onClick={() => {
-                if (window.confirm("Are you sure you want to cancel this order?")) {
-                  // Handle cancel order - would make API call in real app
-                  alert("Order cancellation would be processed here");
-                }
-              }}
+              onClick={() => handleCancelOrder(order.id)}
             >
               Cancel Order
             </button>
@@ -111,22 +117,27 @@ const OrderTracking = () => {
           <AlertTriangle size={24} className="text-red-600 mr-2" />
           <h3 className="text-lg font-medium text-red-600">Order Cancelled</h3>
         </div>
-        <p>This order was cancelled on {new Date(order.cancelledDate).toLocaleDateString()}.</p>
-        <p className="mt-2">Reason: {order.cancellationReason || 'Customer requested cancellation'}</p>
+        <p>This order was cancelled on {new Date().toLocaleDateString()}.</p>
+        <p className="mt-2">Reason: Customer requested cancellation</p>
         
-        {order.refundInfo && (
-          <div className="mt-4 p-4 bg-white rounded-lg">
-            <h4 className="font-medium">Refund Information</h4>
-            <p>Refund Status: {order.refundInfo.status}</p>
-            <p>Amount: ${order.refundInfo.amount.toFixed(2)}</p>
-            {order.refundInfo.date && (
-              <p>Processed on: {new Date(order.refundInfo.date).toLocaleDateString()}</p>
-            )}
-          </div>
-        )}
+        <div className="mt-4 p-4 bg-white rounded-lg">
+          <h4 className="font-medium">Refund Information</h4>
+          <p>Refund Status: Processing</p>
+          <p>Amount: ${order.totalAmount.toFixed(2)}</p>
+          <p>Expected processing time: 5-7 business days</p>
+        </div>
       </div>
     );
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold mb-2">Please Sign In</h3>
+        <p className="text-gray-600 mb-6">You need to be signed in to track your orders.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -173,6 +184,9 @@ const OrderTracking = () => {
                   {order.status === 'Out for Delivery' && <Truck size={16} className="text-purple-500 mr-2" />}
                   <span>{order.status}</span>
                 </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Expected delivery: {new Date(order.expectedDelivery).toLocaleDateString()}
+                </p>
               </div>
             ))}
           </div>

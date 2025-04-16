@@ -1,16 +1,21 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2 } from 'lucide-react';
-import { CartContext } from '../context/CartContext';
+import { Trash2 } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const CartItems = () => {
-  const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useContext(CartContext);
+  const { cart, removeFromCart, updateCartItemQuantity } = useCart();
+  
+  // Calculate cart total
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">My Cart</h1>
 
-      {cartItems.length === 0 ? (
+      {cart.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <h3 className="text-xl font-semibold text-gray-700 mb-2">Your cart is empty</h3>
           <p className="text-gray-500 mb-4">Add items to your cart to proceed to checkout.</p>
@@ -25,11 +30,11 @@ const CartItems = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="md:col-span-2">
-            {cartItems.map(item => (
+            {cart.map(item => (
               <div key={item.id} className="border rounded-lg p-4 mb-4">
                 <div className="flex items-center">
                   <img
-                    src={item.image}
+                    src={item.image || "/api/placeholder/80/80"}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-lg"
                   />
@@ -38,7 +43,7 @@ const CartItems = () => {
                     <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
                     <div className="flex items-center mt-2">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
                         className="px-2 py-1 border border-gray-300 rounded-l hover:bg-gray-100"
                       >
@@ -47,11 +52,12 @@ const CartItems = () => {
                       <input
                         type="number"
                         value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                        onChange={(e) => updateCartItemQuantity(item.id, parseInt(e.target.value))}
                         className="w-12 text-center border-t border-b border-gray-300"
+                        min="1"
                       />
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
                         className="px-2 py-1 border border-gray-300 rounded-r hover:bg-gray-100"
                       >
                         +
